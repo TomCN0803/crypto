@@ -8,7 +8,10 @@ import (
 	"bytes"
 	"crypto/rand"
 	"math/big"
+	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestGFp2Invert(t *testing.T) {
@@ -236,7 +239,7 @@ func TestG1Marshal(t *testing.T) {
 }
 
 func TestG2Marshal(t *testing.T) {
-	g := new(G2).ScalarBaseMult(new(big.Int).SetInt64(1))
+	g := new(G2).Identity()
 	form := g.Marshal()
 	_, ok := new(G2).Unmarshal(form)
 	if !ok {
@@ -255,7 +258,7 @@ func TestG2Marshal(t *testing.T) {
 }
 
 func TestG1Identity(t *testing.T) {
-	g := new(G1).ScalarBaseMult(new(big.Int).SetInt64(0))
+	g := new(G1).Identity()
 	if !g.p.IsInfinity() {
 		t.Error("failure")
 	}
@@ -301,4 +304,20 @@ func BenchmarkPairing(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		Pair(&G1{curveGen}, &G2{twistGen})
 	}
+}
+
+func TestG2_Neg(t *testing.T) {
+	_, a, err := RandomG2(rand.Reader)
+	require.NoError(t, err)
+	aneg := new(G2).Neg(a)
+	a2 := new(G2).Neg(aneg)
+	require.True(t, reflect.DeepEqual(a, a2))
+}
+
+func TestG1_Neg(t *testing.T) {
+	_, a, err := RandomG1(rand.Reader)
+	require.NoError(t, err)
+	aneg := new(G1).Neg(a)
+	a2 := new(G1).Neg(aneg)
+	require.True(t, reflect.DeepEqual(a, a2))
 }

@@ -101,6 +101,11 @@ func (e *G1) Neg(a *G1) *G1 {
 	return e
 }
 
+// Identity gets identity of G1.
+func (e *G1) Identity() *G1 {
+	return new(G1).ScalarBaseMult(big.NewInt(int64(0)))
+}
+
 // Marshal converts n to a byte slice.
 func (e *G1) Marshal() []byte {
 	// Each value is a 256-bit number.
@@ -217,21 +222,35 @@ func (e *G2) Add(a, b *G2) *G2 {
 	return e
 }
 
+// Neg sets e to -a and then returns e.
+func (e *G2) Neg(a *G2) *G2 {
+	if e.p == nil {
+		e.p = newTwistPoint(nil)
+	}
+	e.p.Negative(a.p)
+	return e
+}
+
+// Identity gets identity of G2.
+func (e *G2) Identity() *G2 {
+	return new(G2).ScalarBaseMult(big.NewInt(int64(0)))
+}
+
 // Marshal converts n into a byte slice.
-func (n *G2) Marshal() []byte {
+func (e *G2) Marshal() []byte {
 	// Each value is a 256-bit number.
 	const numBytes = 256 / 8
 
-	if n.p.IsInfinity() {
+	if e.p.IsInfinity() {
 		return make([]byte, numBytes*4)
 	}
 
-	n.p.MakeAffine(nil)
+	e.p.MakeAffine(nil)
 
-	xxBytes := new(big.Int).Mod(n.p.x.x, p).Bytes()
-	xyBytes := new(big.Int).Mod(n.p.x.y, p).Bytes()
-	yxBytes := new(big.Int).Mod(n.p.y.x, p).Bytes()
-	yyBytes := new(big.Int).Mod(n.p.y.y, p).Bytes()
+	xxBytes := new(big.Int).Mod(e.p.x.x, p).Bytes()
+	xyBytes := new(big.Int).Mod(e.p.x.y, p).Bytes()
+	yxBytes := new(big.Int).Mod(e.p.y.x, p).Bytes()
+	yyBytes := new(big.Int).Mod(e.p.y.y, p).Bytes()
 
 	ret := make([]byte, numBytes*4)
 	copy(ret[1*numBytes-len(xxBytes):], xxBytes)
@@ -322,21 +341,21 @@ func (e *GT) Neg(a *GT) *GT {
 }
 
 // Marshal converts n into a byte slice.
-func (n *GT) Marshal() []byte {
-	n.p.Minimal()
+func (e *GT) Marshal() []byte {
+	e.p.Minimal()
 
-	xxxBytes := n.p.x.x.x.Bytes()
-	xxyBytes := n.p.x.x.y.Bytes()
-	xyxBytes := n.p.x.y.x.Bytes()
-	xyyBytes := n.p.x.y.y.Bytes()
-	xzxBytes := n.p.x.z.x.Bytes()
-	xzyBytes := n.p.x.z.y.Bytes()
-	yxxBytes := n.p.y.x.x.Bytes()
-	yxyBytes := n.p.y.x.y.Bytes()
-	yyxBytes := n.p.y.y.x.Bytes()
-	yyyBytes := n.p.y.y.y.Bytes()
-	yzxBytes := n.p.y.z.x.Bytes()
-	yzyBytes := n.p.y.z.y.Bytes()
+	xxxBytes := e.p.x.x.x.Bytes()
+	xxyBytes := e.p.x.x.y.Bytes()
+	xyxBytes := e.p.x.y.x.Bytes()
+	xyyBytes := e.p.x.y.y.Bytes()
+	xzxBytes := e.p.x.z.x.Bytes()
+	xzyBytes := e.p.x.z.y.Bytes()
+	yxxBytes := e.p.y.x.x.Bytes()
+	yxyBytes := e.p.y.x.y.Bytes()
+	yyxBytes := e.p.y.y.x.Bytes()
+	yyyBytes := e.p.y.y.y.Bytes()
+	yzxBytes := e.p.y.z.x.Bytes()
+	yzyBytes := e.p.y.z.y.Bytes()
 
 	// Each value is a 256-bit number.
 	const numBytes = 256 / 8

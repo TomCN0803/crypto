@@ -199,7 +199,7 @@ func miller(q *twistPoint, p *curvePoint, pool *bnPool) *gfP12 {
 	bAffine.MakeAffine(pool)
 
 	minusA := newTwistPoint(pool)
-	minusA.Negative(aAffine, pool)
+	minusA.Negative(aAffine)
 
 	r := newTwistPoint(pool)
 	r.Set(aAffine)

@@ -249,7 +249,7 @@ func (c *twistPoint) MakeAffine(pool *bnPool) *twistPoint {
 	return c
 }
 
-func (c *twistPoint) Negative(a *twistPoint, pool *bnPool) {
+func (c *twistPoint) Negative(a *twistPoint) {
 	c.x.Set(a.x)
 	c.y.SetZero()
 	c.y.Sub(c.y, a.y)
