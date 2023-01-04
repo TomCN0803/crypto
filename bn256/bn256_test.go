@@ -8,7 +8,6 @@ import (
 	"bytes"
 	"crypto/rand"
 	"math/big"
-	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -265,7 +264,7 @@ func TestG1Identity(t *testing.T) {
 }
 
 func TestG2Identity(t *testing.T) {
-	g := new(G2).ScalarBaseMult(new(big.Int).SetInt64(0))
+	g := new(G2).Identity()
 	if !g.p.IsInfinity() {
 		t.Error("failure")
 	}
@@ -311,7 +310,7 @@ func TestG2_Neg(t *testing.T) {
 	require.NoError(t, err)
 	aneg := new(G2).Neg(a)
 	a2 := new(G2).Neg(aneg)
-	require.True(t, reflect.DeepEqual(a, a2))
+	require.True(t, bytes.Equal(a2.Marshal(), a.Marshal()))
 }
 
 func TestG1_Neg(t *testing.T) {
@@ -319,5 +318,5 @@ func TestG1_Neg(t *testing.T) {
 	require.NoError(t, err)
 	aneg := new(G1).Neg(a)
 	a2 := new(G1).Neg(aneg)
-	require.True(t, reflect.DeepEqual(a, a2))
+	require.True(t, bytes.Equal(a2.Marshal(), a.Marshal()))
 }
